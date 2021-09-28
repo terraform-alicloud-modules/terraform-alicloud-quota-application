@@ -1,6 +1,8 @@
 package test
 
 import (
+	"fmt"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -14,12 +16,17 @@ import (
 func TestTerraformBasicExampleNew(t *testing.T) {
 	t.Parallel()
 
+	name := fmt.Sprintf("tf-test-%d", random.Random(100, 1000))
+
 	terraformOptions := &terraform.Options{
 		// The path to where our Terraform code is located
 		TerraformDir: "../example/",
 
 		// Variables to pass to our Terraform code using -var options
-
+		Vars: map[string]interface{}{
+			"name": name,
+			// We also can see how lists and maps translate between terratest and terraform.
+		},
 		// Disable colors in Terraform commands, so it's easier to parse stdout/stderr
 		NoColor: true,
 	}
@@ -31,8 +38,8 @@ func TestTerraformBasicExampleNew(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 
 	// Run `terraform output` to get the values of output variables
-	thisQuotasQuotaApplicationName := terraform.Output(t, terraformOptions, "this_quotas_quota_application_name")
+	thisQuotasQuotaApplicationId := terraform.Output(t, terraformOptions, "this_quotas_quota_application_id")
 
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, thisQuotasQuotaApplicationName, thisQuotasQuotaApplicationName)
+	assert.Equal(t, thisQuotasQuotaApplicationId, thisQuotasQuotaApplicationId)
 }
